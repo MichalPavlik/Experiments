@@ -14,7 +14,6 @@ namespace TestLogger
     [ExtensionUri("logger://microsoft/install-scripts-monitoring/logger/v1")]
     public class SomeTestLogger : ITestLoggerWithParameters
     {
-        private static readonly string[] splitter = new string[] { Environment.NewLine };
         private string reportFilePath;
         private StringWriter outputWriter;
 
@@ -34,7 +33,7 @@ namespace TestLogger
 
         private void InitializeCore(TestLoggerEvents events, string reportFilePath)
         {
-            Debugger.Launch();
+            // Debugger.Launch();
 
             this.reportFilePath = reportFilePath;
             outputWriter = new StringWriter();
@@ -50,15 +49,11 @@ namespace TestLogger
 
         private void Events_TestResult(object sender, TestResultEventArgs e)
         {
-            var errorCodes = e.Result.Messages
-                .Select(m => m.Text)
-                .SelectMany(s => s.Split(splitter, StringSplitOptions.RemoveEmptyEntries))
-                .Where(s => s.StartsWith("!#error-code:"))
-                .Select(s => int.Parse(s.Substring(13)));
-
-            foreach (int errorCode in errorCodes)
+            // Writes output just from failed test
+            if (e.Result.Outcome == TestOutcome.Failed)
             {
-                outputWriter.WriteLine($"{e.Result.DisplayName} - {errorCode}");
+                outputWriter.WriteLine($"{e.Result.DisplayName}:");
+                outputWriter.WriteLine(e.Result.Messages[0].Text);
             }
         }
     }

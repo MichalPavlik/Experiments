@@ -19,18 +19,19 @@ namespace TestProject1
         [Fact]
         public void TestWithErrorCodeLogging()
         {
-            var result = CreateInstallCommand().Execute();
+            var result = CreateInstallCommand()
+                .CaptureStdOut()
+                .Execute();
 
-            testOutputHelper.WriteErrorCode(result.ExitCode);
-            testOutputHelper.WriteLine("A text for different logger");
+            testOutputHelper.WriteLine(result.StdOut);
 
-            testOutputHelper.WriteErrorCode(256);
+            Assert.True(false);
         }
 
         private static Command CreateInstallCommand()
         {
             string path = "powershell.exe";
-            string finalArgs = "-ExecutionPolicy Bypass -NoProfile -NoLogo -Command \"try {. .\\script.ps1} catch {if ($errorCode -eq $null) { $errorCode = 1 }} finally { exit $errorCode }\"";
+            string finalArgs = "-ExecutionPolicy Bypass -NoProfile -NoLogo -Command \".\\script.ps1 -DebugMessages\"";
 
             return Command.Create(new CommandSpec(path, finalArgs, CommandResolutionStrategy.None));
         }

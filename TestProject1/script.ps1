@@ -1,7 +1,16 @@
+[cmdletbinding()]
+param(
+   [switch]$DebugMessages
+)
+
 $ErrorActionPreference="Stop"
 $ProgressPreference="SilentlyContinue"
 
 Write-Output "Doing something important"
 
-$errorCode = 357
+if ($DebugMessages)
+{
+	Write-Output "Debug!!: Debugging message"
+}
+
 throw "Oh no!"
